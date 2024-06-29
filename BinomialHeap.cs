@@ -16,7 +16,7 @@ public class BinomialHeap<T> where T: IComparable, new() {
         Head = Min = new(data);
     }
 
-    public void insert(T value) {
+    public void Insert(T value) {
         if(Head == null) {
             Min = Head = new(value);
             ++Size;
@@ -36,25 +36,31 @@ public class BinomialHeap<T> where T: IComparable, new() {
         NodeBinomial<T>? h1Iter = Head, h2Iter = heap2.Head, finalRootList = null, current = null;
 
         while(h1Iter != null && h2Iter != null) {
-            if (CheckValues(h1Iter.Data, h2Iter.Data)) {
-                if (current != null)
-                    current!.Sibling = h1Iter;
-                else
+            //if not initialized pick the smaller one to start the list
+            if(current == null) {
+               if(!Greater(h1Iter.Data, h2Iter.Data)) {
                     current = h1Iter;
+                    h1Iter= h1Iter.Sibling;
+                }
+                else {
+                    current = h2Iter;
+                    h2Iter = h2Iter.Sibling;
+                }
+                finalRootList = current;
+            }
 
+            else if (!Greater(h1Iter.Data, h2Iter.Data)) {
+                current!.Sibling = h1Iter;
+                current = current.Sibling;
                 h1Iter = h1Iter.Sibling;
             }
             else {
                 h2Iter.Parent = null;
-                if (current != null)
-                    current!.Sibling = h2Iter;
-                else
-                    current = h2Iter;
+                current!.Sibling = h2Iter;
+                current = current.Sibling;
                 h2Iter = h2Iter.Sibling;
 
-            }
-            if (finalRootList == null)
-                finalRootList = current;
+            } 
         }
 
         if(h1Iter != null)
@@ -72,7 +78,7 @@ public class BinomialHeap<T> where T: IComparable, new() {
         }
 
         Size += heap2.Size;
-        Min = CheckValues(Min!.Data, heap2.Min!.Data) 
+        Min = Greater(Min!.Data, heap2.Min!.Data) 
             ? heap2.Min
             : Min;
         Head = finalRootList;
@@ -80,7 +86,7 @@ public class BinomialHeap<T> where T: IComparable, new() {
         heap2.Size = 0;
     }
 
-    private bool CheckValues(T value1, T value2) {
+    private bool Greater(T value1, T value2) {
         return value1.CompareTo(value2) == 1 ? true : false; 
     }
 

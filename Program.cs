@@ -5,14 +5,14 @@ public class Program {
 
         BinomialHeap<int> heap = new();
 
-        heap.insert(1);
-        heap.insert(2);
-        heap.insert(3);
-        heap.insert(4);
-        heap.insert(5);
-        heap.insert(6);
-        heap.insert(7);
-        heap.insert(8);
+        heap.Insert(1);
+        heap.Insert(2);
+        heap.Insert(3);
+        heap.Insert(4);
+        heap.Insert(5);
+        heap.Insert(6);
+        heap.Insert(7);
+        heap.Insert(8);
         heap.PrintRootList();
 
         Console.WriteLine($"Min: {heap!.Min!.Data}");
