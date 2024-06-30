@@ -44,9 +44,6 @@ public class BinomialHeap<T> where T : IComparable, new()
         NodeBinomial<T> current = Head!, next = Head!.Sibling!;
 
         while(next != null) {
-            if (!Greater(current.Data, Min!.Data))
-                Min = current;
-
             if(CheckUnionSkip(current, next)) {
                 prev = current;
                 current = next;
@@ -74,6 +71,7 @@ public class BinomialHeap<T> where T : IComparable, new()
             }
             next = current.Sibling!;
         }
+        FindMin();
     }
 
     public void HeapMerge(BinomialHeap<T> heap2)
@@ -136,6 +134,20 @@ public class BinomialHeap<T> where T : IComparable, new()
         Head = finalRootList;
         heap2.Head = heap2.Min = current = null;
         heap2.Size = 0;
+    }
+
+    private void FindMin() {
+        NodeBinomial<T> tmp = Head!;
+
+        while(tmp != null) {
+
+            if (Min == null)
+                Min = tmp;
+            else if (!Greater(tmp.Data, Min!.Data))
+                Min = tmp;
+
+            tmp = tmp.Sibling!;
+        }
     }
 
     private bool CheckUnionSkip(NodeBinomial<T> current, NodeBinomial<T> next) {
