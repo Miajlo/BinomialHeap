@@ -1,4 +1,6 @@
-﻿namespace GenericBinomialHeap;
+﻿using GenericBinomialHeap.Models;
+
+namespace GenericBinomialHeap;
 
 public class Program {
     public static void Main(string[] args) {
