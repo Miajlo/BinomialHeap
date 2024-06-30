@@ -1,4 +1,7 @@
-﻿namespace GenericBinomialHeap.Models;
+﻿using System.Security;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace GenericBinomialHeap.Models;
 
 //Min Binomial Heap at the moment, will support choosing between min or max version
 public class BinomialHeap<T> where T : IComparable, new()
@@ -37,7 +40,40 @@ public class BinomialHeap<T> where T : IComparable, new()
     {
         HeapMerge(heap2);
 
-        //TO DO: implement the rest of the union logic
+        NodeBinomial<T>? prev = null;
+        NodeBinomial<T> current = Head!, next = Head!.Sibling!;
+
+        while(next != null) {
+            if (!Greater(current.Data, Min!.Data))
+                Min = current;
+
+            if(CheckUnionSkip(current, next)) {
+                prev = current;
+                current = next;
+            }
+            else {
+                if(!Greater(current.Data,next.Data)) {
+                    current.Sibling = next.Sibling;
+                    next.Parent = current;
+                    next.Sibling = current.Child;
+                    current.Child = next;
+                    current.Degree++;
+                }
+                else {
+                    if (prev == null)
+                        Head = next;
+                    else
+                        prev.Sibling = next;
+
+                    current.Parent = next;
+                    current.Sibling = next.Child;
+                    next.Child = current;
+                    next.Degree++;
+                    current = next;
+                }            
+            }
+            next = current.Sibling!;
+        }
     }
 
     public void HeapMerge(BinomialHeap<T> heap2)
@@ -50,7 +86,7 @@ public class BinomialHeap<T> where T : IComparable, new()
         //if not initialized pick the smaller one to start the list
         //Not in loop to avoid unnecessary check for every iteration
         if (current == null) {
-            if (!Greater(h1Iter.Data, h2Iter.Data)) {
+            if (h1Iter.Degree <= h2Iter.Degree) {
                 current = h1Iter;
                 h1Iter = h1Iter.Sibling;
             }
@@ -63,7 +99,7 @@ public class BinomialHeap<T> where T : IComparable, new()
 
         while (h1Iter != null && h2Iter != null)
         {
-            if (!Greater(h1Iter.Data, h2Iter.Data)) {
+            if (h1Iter.Degree <= h2Iter.Degree) {
                 current!.Sibling = h1Iter;
                 current = current.Sibling;
                 h1Iter = h1Iter.Sibling;
@@ -100,6 +136,12 @@ public class BinomialHeap<T> where T : IComparable, new()
         Head = finalRootList;
         heap2.Head = heap2.Min = current = null;
         heap2.Size = 0;
+    }
+
+    private bool CheckUnionSkip(NodeBinomial<T> current, NodeBinomial<T> next) {
+        return current.Degree != next.Degree ||
+               (next.Sibling != null &&
+               next.Sibling.Degree == current.Degree);
     }
 
     public T? ExtractMin() {
