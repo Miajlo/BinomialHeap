@@ -1,7 +1,4 @@
-﻿using System.Security;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace GenericBinomialHeap.Models;
+﻿namespace GenericBinomialHeap.Models;
 
 //Min Binomial Heap at the moment, will support choosing between min or max version
 public class BinomialHeap<T> where T : IComparable, new()
@@ -10,22 +7,18 @@ public class BinomialHeap<T> where T : IComparable, new()
     public NodeBinomial<T>? Min { get; private set; }
     public int Size { get; set; }
 
-    public BinomialHeap()
-    {
+    public BinomialHeap() {
         Size = 0;
         Head = Min = null;
     }
 
-    public BinomialHeap(T data)
-    {
+    public BinomialHeap(T data) {
         Size = 1;
         Head = Min = new(data);
     }
 
-    public void Insert(T value)
-    {
-        if (Head == null)
-        {
+    public void Insert(T value) {
+        if (Head == null) {
             Min = Head = new(value);
             ++Size;
             return;
@@ -34,10 +27,11 @@ public class BinomialHeap<T> where T : IComparable, new()
         BinomialHeap<T>? helper = new(value);
 
         HeapUnion(helper);
+
+        helper.Head = helper.Min = null; // discard the helper heap
     }
 
-    public void HeapUnion(BinomialHeap<T> heap2)
-    {
+    public void HeapUnion(BinomialHeap<T> heap2) {
         HeapMerge(heap2);
 
         NodeBinomial<T>? prev = null;
@@ -71,11 +65,9 @@ public class BinomialHeap<T> where T : IComparable, new()
             }
             next = current.Sibling!;
         }
-        FindMin();
     }
 
-    public void HeapMerge(BinomialHeap<T> heap2)
-    {
+    public void HeapMerge(BinomialHeap<T> heap2) {
         NodeBinomial<T>? h1Iter = Head, h2Iter = heap2.Head, finalRootList = null, current = null;
 
         if (h1Iter == null || h2Iter == null)
@@ -95,8 +87,7 @@ public class BinomialHeap<T> where T : IComparable, new()
             finalRootList = current;
         }
 
-        while (h1Iter != null && h2Iter != null)
-        {
+        while (h1Iter != null && h2Iter != null) {
             if (h1Iter.Degree <= h2Iter.Degree) {
                 current!.Sibling = h1Iter;
                 current = current.Sibling;
@@ -116,10 +107,8 @@ public class BinomialHeap<T> where T : IComparable, new()
             current!.Sibling = h2Iter;
 
         //In case of ExtractMin
-        if (h2Iter != null && h2Iter.Parent != null)
-        {
-            while (h2Iter != null)
-            {
+        if (h2Iter != null && h2Iter.Parent != null) {
+            while (h2Iter != null) {
                 h2Iter.Parent = null;
                 current!.Sibling = h2Iter;
                 current = current.Sibling;
@@ -158,26 +147,98 @@ public class BinomialHeap<T> where T : IComparable, new()
 
     public T? ExtractMin() {
 
-        //To do: implement extract min
-        return default(T);
+        if (Head == null)
+            return default(T);
+
+        NodeBinomial<T>? current = Head, previous = null;
+
+        while(current != null && current != Min) {
+            current = current.Sibling;
+            previous = current;
+        }
+
+        if (previous == null)
+            Head = current!.Sibling;
+        else
+            previous.Sibling = current!.Sibling;
+
+        T? data = Min!.Data;
+        Min = null;
+        current = current!.Child;
+       
+        if (Head == null && current == null)
+            Size = 0;
+        else {
+            if (Head == null && current != null) {
+                Head = current.RevertSiblingList(null);
+                --Size;
+            }
+            else {
+                if (Head != null && current == null) 
+                    --Size;               
+                else {
+                    BinomialHeap<T> unionHeap = new();
+                    unionHeap.Head = current!.RevertSiblingList(null);
+                    HeapUnion(unionHeap);
+                    --Size;
+                }
+
+            }
+        }
+
+        FindMin();
+
+        return data;
     }
 
     public NodeBinomial<T>? ExtractMinNode() {
-        //To Do: implement the extract min node
-        return null;
+        if (Head == null)
+            return null;
+
+        NodeBinomial<T>? current = Head, previous = null;
+
+        while (current != null && current != Min) {
+            current = current.Sibling;
+            previous = current;
+        }
+
+        if (previous == null)
+            Head = current!.Sibling;
+        else
+            previous.Sibling = current!.Sibling;
+
+        NodeBinomial<T>? retVal = current;        
+        Min = null;
+        current = current!.Child;
+
+        if (Head == null && current == null)
+            Size = 0;
+        else {
+            if (Head == null && current != null) {
+                Head = current.RevertSiblingList(null);
+                --Size;
+            }
+            else {
+                if (Head != null && current == null)
+                    --Size;
+                else {
+                    BinomialHeap<T> unionHeap = new();
+                    unionHeap.Head = current!.RevertSiblingList(null);
+                    HeapUnion(unionHeap);
+                    --Size;
+                }
+
+            }
+        }
+
+        FindMin();
+
+        return retVal;
     }
 
     private bool Greater(T value1, T value2)
     {
         return value1.CompareTo(value2) == 1 ? true : false;
-    }
-
-    public static void HeapMerge(BinomialHeap<T> heap1, BinomialHeap<T> heap2) {
-        //To Do: impement static version of heap merge
-    }
-
-    public static void HeapUnion(BinomialHeap<T> heap1, BinomialHeap<T> heap2) {
-        //To Do: impement static version of heap union
     }
 
     public void PrintRootList()

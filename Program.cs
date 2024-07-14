@@ -19,6 +19,13 @@ public class Program {
 
         Console.WriteLine($"Min: {heap!.Min!.Data}");
         Console.WriteLine($"Size: {heap.Size}");
+
+        Console.WriteLine($"Extracted: {heap.ExtractMin()}");
+
+        heap.PrintRootList();
+
+        Console.WriteLine($"Min: {heap!.Min!.Data}");
+        Console.WriteLine($"Size: {heap.Size}");
     }
 }
 
