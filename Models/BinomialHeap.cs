@@ -170,7 +170,7 @@ public class BinomialHeap<T> where T : IComparable, new()
             Size = 0;
         else {
             if (Head == null && current != null) {
-                Head = current.RevertSiblingList(null);
+                Head = ReverseChildList(current);
                 --Size;
             }
             else {
@@ -178,7 +178,7 @@ public class BinomialHeap<T> where T : IComparable, new()
                     --Size;               
                 else {
                     BinomialHeap<T> unionHeap = new();
-                    unionHeap.Head = current!.RevertSiblingList(null);
+                    unionHeap.Head = ReverseChildList(current);
                     HeapUnion(unionHeap);
                     --Size;
                 }
@@ -215,7 +215,7 @@ public class BinomialHeap<T> where T : IComparable, new()
             Size = 0;
         else {
             if (Head == null && current != null) {
-                Head = current.RevertSiblingList(null);
+                Head = ReverseChildList(current);
                 --Size;
             }
             else {
@@ -223,7 +223,7 @@ public class BinomialHeap<T> where T : IComparable, new()
                     --Size;
                 else {
                     BinomialHeap<T> unionHeap = new();
-                    unionHeap.Head = current!.RevertSiblingList(null);
+                    unionHeap.Head = ReverseChildList(current);
                     HeapUnion(unionHeap);
                     --Size;
                 }
@@ -236,6 +236,19 @@ public class BinomialHeap<T> where T : IComparable, new()
         return retVal;
     }
 
+    private static NodeBinomial<T>? ReverseChildList(NodeBinomial<T>? node) {
+        NodeBinomial<T>? tmp = null;
+
+        while(node != null) {
+            var helper = node.Sibling;
+            node.Sibling = tmp;
+            tmp = node;
+            node = helper;
+        }
+
+        return tmp;
+    }
+
     private bool Greater(T value1, T value2)
     {
         return value1.CompareTo(value2) == 1 ? true : false;
@@ -245,8 +258,7 @@ public class BinomialHeap<T> where T : IComparable, new()
     {
         NodeBinomial<T>? tmp = Head;
 
-        while (tmp != null)
-        {
+        while (tmp != null) {
             Console.Write($"{tmp.Data} ");
             tmp = tmp.Sibling;
         }
