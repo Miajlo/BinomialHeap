@@ -249,13 +249,11 @@ public class BinomialHeap<T> where T : IComparable, new()
         return tmp;
     }
 
-    private bool Greater(T value1, T value2)
-    {
+    private bool Greater(T value1, T value2) {
         return value1.CompareTo(value2) == 1 ? true : false;
     }
 
-    public void PrintRootList()
-    {
+    public void PrintRootList() {
         NodeBinomial<T>? tmp = Head;
 
         while (tmp != null) {
